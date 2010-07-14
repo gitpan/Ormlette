@@ -3,7 +3,7 @@ package Ormlette;
 use strict;
 use warnings;
 
-our $VERSION = 0.001000;
+our $VERSION = 0.002000;
 
 use Carp;
 
@@ -391,7 +391,7 @@ Ormlette - Light and fluffy object persistence
 
 =head1 VERSION
 
-version 0.01
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,7 @@ abstract: 'Light and fluffy object persistence'
 author:
   - 'Dave Sherohman <dsheroh@cpan.org>'
 build_requires:
+  DBD::SQLite: 0
   DBI: 0
   FindBin: 0
   Test::Exception: 0
@@ -18,7 +19,8 @@ meta-spec:
 name: Ormlette
 requires:
   Carp: 0
+  DBI: 0
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Ormlette
   repository: git://sherohman.org/ormlette
-version: 0.01
+version: 0.002

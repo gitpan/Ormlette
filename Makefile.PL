@@ -12,6 +12,7 @@ my %WriteMakefileArgs = (
   'ABSTRACT' => 'Light and fluffy object persistence',
   'AUTHOR' => 'Dave Sherohman <dsheroh@cpan.org>',
   'BUILD_REQUIRES' => {
+    'DBD::SQLite' => '0',
     'DBI' => '0',
     'FindBin' => '0',
     'Test::Exception' => '0',
@@ -25,9 +26,10 @@ my %WriteMakefileArgs = (
   'LICENSE' => 'perl',
   'NAME' => 'Ormlette',
   'PREREQ_PM' => {
-    'Carp' => '0'
+    'Carp' => '0',
+    'DBI' => '0'
   },
-  'VERSION' => '0.01',
+  'VERSION' => '0.002',
   'test' => {
     'TESTS' => 't/*.t'
   }

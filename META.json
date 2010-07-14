@@ -21,11 +21,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0
+            "Carp" : 0,
+            "DBI" : 0
          }
       },
       "test" : {
          "requires" : {
+            "DBD::SQLite" : 0,
             "DBI" : 0,
             "FindBin" : 0,
             "Test::Exception" : 0,
@@ -44,6 +46,6 @@
          "url" : "git://sherohman.org/ormlette"
       }
    },
-   "version" : "0.01"
+   "version" : "0.002"
 }
 

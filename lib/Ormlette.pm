@@ -3,7 +3,7 @@ package Ormlette;
 use strict;
 use warnings;
 
-our $VERSION = 0.002000;
+our $VERSION = 0.003;
 
 use Carp;
 
@@ -20,12 +20,14 @@ sub init {
   my $self = bless {
     dbh         => $dbh,
     debug       => $params{debug} ? 1 : 0,
+    ignore_root => $params{ignore_root},
+    isa         => $params{isa},
     namespace   => $namespace,
     readonly    => $params{readonly} ? 1 : 0,
     tbl_names   => $tbl_names,
   }, $class;
 
-  $self->_build_root_pkg;
+  $self->_build_root_pkg unless $self->{ignore_root};
   $self->_build_table_pkg($_) for keys %$tbl_names;
 
   return $self;
@@ -47,6 +49,9 @@ sub _scan_tables {
   if ($params{tables}) {
     my %include = map { $_ => 1 } @{$params{tables}};
     @tables = grep { $include{$_} } @tables;
+  } elsif ($params{ignore_tables}) {
+    my %exclude = map { $_ => 1 } @{$params{ignore_tables}};
+    @tables = grep { !$exclude{$_} } @tables;
   }
 
   my %tbl_names;
@@ -103,7 +108,7 @@ sub _compile_pkg {
 sub _pkg_core {
   my ($self, $pkg_name) = @_;
 
-  return <<"END_CODE";
+  my $core = <<"END_CODE";
 package $pkg_name;
 
 use strict;
@@ -111,6 +116,19 @@ use warnings;
 
 use Carp;
 
+END_CODE
+
+  no strict 'refs';
+  if ($self->{isa} && !@{ $pkg_name . '::ISA' }) {
+    my $isa = $self->{isa};
+    $core .= <<"END_CODE";
+our \@ISA = '$isa';
+
+END_CODE
+  }
+  use strict 'refs';
+
+  $core .= <<"END_CODE";
 my \$_ormlette_dbh;
 
 sub dbh { \$_ormlette_dbh }
@@ -121,6 +139,8 @@ sub _ormlette_init {
 }
 
 END_CODE
+
+  return $core;
 }
 
 sub _root_methods {
@@ -165,6 +185,7 @@ sub iterate {
   my \$sth = \$class->dbh->prepare_cached(\$sql);
   \$sth->execute(\@_);
 
+  local \$_;
   while (\$_ = \$class->_ormlette_load_from_sth(\$sth)) {
     \$callback->();
   }
@@ -391,7 +412,7 @@ Ormlette - Light and fluffy object persistence
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -437,6 +458,36 @@ The C<debug> option will cause additional debugging information to be printed
 to STDERR as Ormlette does its initialization.  At this point, this consists
 solely of the generated source code for each package affected by Ormlette.
 
+=head3 isa
+
+Specifies that all Ormlette-generated classes should be made subclasses of
+the C<isa> package.  This is done by directly setting C<@ISA>, not via C<use
+base> or C<use parent>, so you are responsible for ensuring that the
+specified class is available to use as a parent.
+
+If Ormlette is adding to a class which already exists and already has a
+parent in C<@ISA>, the existing parent will be untouched and the C<isa> option
+will have no effect on that class.
+
+=head3 ignore_root
+
+Ormlette will normally inject a C<dbh> method into the base namespace of its
+generated code, providing access to the source database.  This is not always
+desirable.  In such cases, setting C<ignore_root> will prevent Ormlette from
+making any modifications to that package.
+
+=head3 ignore_tables
+
+Ormlette will normally generate classes corresponding to all tables found
+in the database.  If there are tables which should be skipped over, a
+reference to an array of table names to skip can be passed in the
+C<ignore_tables> parameter.
+
+If you prefer to list the tables to include rather than the tables to
+exclude, use C<tables>.  There should never be a reason to specify both
+C<tables> and C<ignore_tables>, but, if this is done, C<tables> will take
+precedence and C<ignore_tables> will be silently ignored.
+
 =head3 namespace
 
 By default, Ormlette will use the name of the package which calls C<init> as
@@ -455,15 +506,22 @@ If you only require Ormlette code to be generated for some of the tables in
 your database, providing a reference to an array of table names in the
 C<tables> parameter will cause all other tables to be ignored.
 
+If you prefer to list the tables to exclude rather than those to include,
+use C<ignore_tables>.
+
 =back
 
 =head2 dbh
 
 Returns the internal database handle used for database interaction.  Can be
-called on the core Ormlette object, the root namespace of its generated code,
-or any of the persistent classes generated in that namespace.
+called on the core Ormlette object, the root namespace of its generated code
+(unless the C<ignore_root> option is set when calling C<init>), or any of the
+persistent classes generated in that namespace.
 
 =head1 Root Namespace Methods
+
+If the C<ignore_root> option is set when calling C<init>, no methods will
+be generated in the root namespace.
 
 =head2 dbh
 

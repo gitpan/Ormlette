@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     'Carp' => '0',
     'DBI' => '0'
   },
-  'VERSION' => '0.002',
+  'VERSION' => '0.003',
   'test' => {
     'TESTS' => 't/*.t'
   }

@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 
 use FindBin;
 use lib ("$FindBin::Bin/../lib" =~ m[^(/.*)])[0];
@@ -18,3 +18,4 @@ use Ormlette;
   is(DBHTest->dbh, $dbh, 'retrieve dbh via root namespace');
 }
 
+done_testing;

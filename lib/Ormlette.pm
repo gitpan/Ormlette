@@ -333,7 +333,6 @@ sub insert {
   my \$sth = \$self->dbh->prepare_cached(\$sql);
   \$sth->execute($insert_values);
   $handle_autoincrement
-  \$sth->finish;
   return \$self;
 }
 
@@ -357,8 +356,8 @@ sub update {
   my \$self = shift;
   my \$sql = 'UPDATE $tbl_name SET $update_fields WHERE $key_criteria';
   my \$sth = \$self->dbh->prepare_cached(\$sql);
-  \$sth->execute($insert_values, $key_values);
-  \$sth->finish;
+  my \$changed = \$sth->execute($insert_values, $key_values);
+  \$self->insert unless \$changed > 0;
 
   return \$self;
 }
@@ -397,6 +396,17 @@ sub new { my $class = shift; $class->_ormlette_new(@_); }
 ';
   }
 
+  if (@key) {
+    my $destroy_name =
+      $pkg_name->can('DESTROY') ? '_ormlette_DESTROY' : 'DESTROY';
+    $code .= "
+sub mark_dirty { \$_[0]->{_dirty} = 1 }
+sub mark_clean { \$_[0]->{_dirty} = 0 }
+sub dirty      { return \$_[0]->{_dirty} }
+
+sub $destroy_name { \$_[0]->update if \$_[0]->{_dirty} }"
+  }
+
   return $code;
 }
 
@@ -412,7 +422,7 @@ Ormlette - Light and fluffy object persistence
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -570,6 +580,23 @@ available for further use, including re-saving it to the database.
 This method will not be generated if C<readonly> is set.  The instance method
 variant will only be generated for tables which have a primary key.
 
+=head2 dirty
+
+Read-only flag indicating whether an object is "dirty" (i.e., has unsaved
+changes).  This flag is not maintained automatically; code using the object
+must use its C<mark_dirty> method to set the flag and C<mark_clean> to clear
+it.
+
+If an object is destroyed while dirty, a C<DESTROY> handler will automatically
+call its C<update> method to write changes to the database.  If the class
+already has a C<DESTROY> handler prior to Ormlette initialization, this check
+is instead placed into an C<_ormlette_DESTROY> method, which the other
+C<DESTROY> should call if autoupdate functionality is desired.
+
+The C<dirty> attribute, C<mark_dirty> and C<mark_clean> methods, and C<DESTROY>
+handler will not be generated if C<readonly> is set or for tables which do
+not have a primary key.
+
 =head2 insert
 
 Inserts the object into the database as a new record.  This method will fail if
@@ -589,6 +616,14 @@ primary difference between this method and C<select> is that C<iterate> only
 loads one record into memory at a time, while C<select> loads all records at
 once, which may require unacceptable amounts of memory when dealing with larger
 data sets.
+
+=head2 mark_clean
+
+Clears an object's C<dirty> flag.
+
+=head2 mark_dirty
+
+Sets an object's C<dirty> flag.
 
 =head2 new
 
@@ -636,8 +671,8 @@ Returns the table name in which Ormlette stores this class's data.
 
 =head2 update
 
-Updates the object's existing database record.  This method will fail if the
-object does not already exist in the database.
+Updates the object's existing database record.  This method will implicitly
+call C<insert> if the object does not already exist in the database.
 
 This method will not be generated if C<readonly> is set or for tables which
 do not have a primary key.
@@ -679,7 +714,7 @@ Dave Sherohman <dsheroh@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Dave Sherohman.
+This software is copyright (c) 2012 by Dave Sherohman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,34 +4,36 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Light and fluffy object persistence',
-  'AUTHOR' => 'Dave Sherohman <dsheroh@cpan.org>',
-  'BUILD_REQUIRES' => {
-    'DBD::SQLite' => '0',
-    'DBI' => '0',
-    'FindBin' => '0',
-    'Test::Exception' => '0',
-    'Test::More' => '0'
+  "ABSTRACT" => "Light and fluffy object persistence",
+  "AUTHOR" => "Dave Sherohman <dsheroh\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "DBD::SQLite" => 0,
+    "DBI" => 0,
+    "FindBin" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'Ormlette',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'Ormlette',
-  'PREREQ_PM' => {
-    'Carp' => '0',
-    'DBI' => '0'
+  "DISTNAME" => "Ormlette",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Ormlette",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "DBI" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  'VERSION' => '0.003',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.004",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

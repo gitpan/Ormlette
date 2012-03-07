@@ -4,7 +4,7 @@
       "Dave Sherohman <dsheroh@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530",
    "license" : [
       "perl_5"
    ],
@@ -16,22 +16,24 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.31"
+            "ExtUtils::MakeMaker" : "6.30"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "DBI" : 0
+            "Carp" : "0",
+            "DBI" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "DBD::SQLite" : 0,
-            "DBI" : 0,
-            "FindBin" : 0,
-            "Test::Exception" : 0,
-            "Test::More" : 0
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "FindBin" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -46,6 +48,6 @@
          "url" : "git://sherohman.org/ormlette"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004"
 }
 

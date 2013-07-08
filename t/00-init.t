@@ -38,6 +38,16 @@ use Ormlette;
   }, 'found all tables and built package names');
 }
 
+# use double-underscore for multi-level class structure
+{
+  my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:', '', '');
+  $dbh->do('CREATE TABLE multi__level ( id integer )');
+  my $egg = Ormlette->init($dbh);
+  is_deeply($egg->{tbl_names}, {
+      multi__level => 'main::Multi::Level'
+  }, 'double underscore in table name gives multi-level package name');
+}
+
 # correctly identify root namespace
 {
   package Root;
@@ -115,7 +125,7 @@ use Ormlette;
   my $egg = Ormlette->init($dbh, isa => 'Parent');
   is_deeply([@main::IsaTest::ISA], ['Parent'], 'set @ISA with isa param');
   my $isa_test = IsaTest->new;
-  isa_ok($isa_test, 'IsaTest', 'parented class is itself');
+  isa_ok($isa_test, 'main::IsaTest', 'parented class is itself');
   isa_ok($isa_test, 'Parent',  'parented class is descended from parent');
 }
 

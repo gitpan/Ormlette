@@ -1,5 +1,9 @@
 Revision history for Ormlette
 
+0.005   2013-07-08
+        - Allow double underscore in table name for multi-level packages
+          e.g., foo__bar becomes MyApp::Foo::Bar
+
 0.004   2012-03-07
         - Reorganized test scripts
         - Added basic testing for MySQL data store

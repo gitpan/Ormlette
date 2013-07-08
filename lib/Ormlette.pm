@@ -3,7 +3,7 @@ package Ormlette;
 use strict;
 use warnings;
 
-our $VERSION = 0.003;
+our $VERSION = 0.005;
 
 use Carp;
 
@@ -56,7 +56,9 @@ sub _scan_tables {
 
   my %tbl_names;
   for (@tables) {
-    my @words = split '_', lc $_;
+    my $tbl = lc $_;
+    $tbl =~ s/__(.)/::\U$1/g;
+    my @words = split '_', $tbl;
     $tbl_names{$_} = $namespace . '::' . (join '', map { ucfirst } @words);
   }
 
@@ -412,8 +414,6 @@ sub $destroy_name { \$_[0]->update if \$_[0]->{_dirty} }"
 
 1;
 
-
-
 =pod
 
 =head1 NAME
@@ -422,7 +422,7 @@ Ormlette - Light and fluffy object persistence
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -720,7 +720,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
 
 __END__
 
